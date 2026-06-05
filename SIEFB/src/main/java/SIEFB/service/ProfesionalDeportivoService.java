@@ -1,0 +1,18 @@
+package SIEFB.service;
+
+import java.util.List;
+
+import java.util.Optional;
+import SIEFB.model.ProfesionalDeportivo;
+public interface ProfesionalDeportivoService {
+
+	List<ProfesionalDeportivo> listar();
+
+    Optional<ProfesionalDeportivo> obtenerPorId(Integer id);
+
+    ProfesionalDeportivo guardar(ProfesionalDeportivo profesional);
+
+    ProfesionalDeportivo actualizar(Integer id, ProfesionalDeportivo profesional);
+
+    void eliminar(Integer id);
+}
