@@ -2,14 +2,14 @@ package SIEFB.controller;
 
 import java.util.List;
 
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import SIEFB.model.*;
+import jakarta.validation.Valid;
+import SIEFB.model.Administrador;
 import SIEFB.service.AdministradorService;
 
 @RestController
@@ -17,32 +17,56 @@ import SIEFB.service.AdministradorService;
 @CrossOrigin(origins = "*")
 public class AdministradorController {
 
-	@Autowired
+    @Autowired
     private AdministradorService administradorService;
 
+    // GET ALL
     @GetMapping
-    public List<Administrador> listar() {
-        return administradorService.listar();
+    public ResponseEntity<List<Administrador>> listar() {
+        return ResponseEntity.ok(administradorService.listar());
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
-    public Administrador obtener(@PathVariable Integer id) {
-        return administradorService.obtenerPorId(id)
-                .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+    public ResponseEntity<Administrador> obtener(@PathVariable Integer id) {
+
+        Administrador administrador = administradorService.obtenerPorId(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Administrador no encontrado con id: " + id
+                ));
+
+        return ResponseEntity.ok(administrador);
     }
 
+    // CREATE
     @PostMapping
-    public Administrador crear(@RequestBody Administrador administrador) {
-        return administradorService.guardar(administrador);
+    public ResponseEntity<Administrador> crear(@Valid @RequestBody Administrador administrador) {
+
+        Administrador nuevo = administradorService.guardar(administrador);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(nuevo);
     }
 
+    // UPDATE
     @PutMapping("/{id}")
-    public Administrador actualizar(@PathVariable Integer id, @RequestBody Administrador administrador) {
-        return administradorService.actualizar(id, administrador);
+    public ResponseEntity<Administrador> actualizar(
+            @PathVariable Integer id,
+            @Valid @RequestBody Administrador administrador) {
+
+        Administrador actualizado = administradorService.actualizar(id, administrador);
+
+        return ResponseEntity.ok(actualizado);
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+
         administradorService.eliminar(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

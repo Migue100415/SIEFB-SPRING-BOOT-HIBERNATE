@@ -2,8 +2,6 @@ package SIEFB.model;
 
 import java.time.LocalDate;
 
-
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 

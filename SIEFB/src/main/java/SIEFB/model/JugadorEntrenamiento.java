@@ -1,9 +1,12 @@
 package SIEFB.model;
 
 import jakarta.persistence.*;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "jugador_entrenamiento", uniqueConstraints = {
@@ -20,10 +23,12 @@ public class JugadorEntrenamiento {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jugador_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Jugador jugador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "entrenamiento_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Entrenamiento entrenamiento;
 
     @NotNull(message = "Debes confirmar la asistencia")

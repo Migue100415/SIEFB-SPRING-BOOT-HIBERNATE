@@ -2,11 +2,13 @@ package SIEFB.controller;
 
 import java.util.List;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.validation.Valid;
 import SIEFB.model.Partido;
 import SIEFB.service.PartidoService;
 
@@ -15,32 +17,56 @@ import SIEFB.service.PartidoService;
 @CrossOrigin(origins = "*")
 public class PartidoController {
 
-	@Autowired
+    @Autowired
     private PartidoService partidoService;
 
+    // GET ALL
     @GetMapping
-    public List<Partido> listar() {
-        return partidoService.listar();
+    public ResponseEntity<List<Partido>> listar() {
+        return ResponseEntity.ok(partidoService.listar());
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
-    public Partido obtener(@PathVariable Integer id) {
-        return partidoService.obtenerPorId(id)
-                .orElseThrow(() -> new RuntimeException("Partido no encontrado"));
+    public ResponseEntity<Partido> obtener(@PathVariable Integer id) {
+
+        Partido partido = partidoService.obtenerPorId(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Partido no encontrado con id: " + id
+                ));
+
+        return ResponseEntity.ok(partido);
     }
 
+    // CREATE
     @PostMapping
-    public Partido crear(@RequestBody Partido partido) {
-        return partidoService.guardar(partido);
+    public ResponseEntity<Partido> crear(@Valid @RequestBody Partido partido) {
+
+        Partido nuevo = partidoService.guardar(partido);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(nuevo);
     }
 
+    // UPDATE
     @PutMapping("/{id}")
-    public Partido actualizar(@PathVariable Integer id, @RequestBody Partido partido) {
-        return partidoService.actualizar(id, partido);
+    public ResponseEntity<Partido> actualizar(
+            @PathVariable Integer id,
+            @Valid @RequestBody Partido partido) {
+
+        Partido actualizado = partidoService.actualizar(id, partido);
+
+        return ResponseEntity.ok(actualizado);
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+
         partidoService.eliminar(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

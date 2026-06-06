@@ -5,42 +5,52 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import SIEFB.model.Persona;
 import SIEFB.service.PersonaService;
 
 @RestController
 @RequestMapping("/api/personas")
 @CrossOrigin(origins = "*")
+@Validated
 public class PersonaController {
 
-	@Autowired
+    @Autowired
     private PersonaService personaService;
 
     @GetMapping
-    public List<Persona> listar() {
-        return personaService.listar();
+    public ResponseEntity<List<Persona>> listar() {
+        return ResponseEntity.ok(personaService.listar());
     }
 
     @GetMapping("/{id}")
-    public Persona obtener(@PathVariable Integer id) {
+    public ResponseEntity<Persona> obtener(@PathVariable Integer id) {
         return personaService.obtenerPorId(id)
-                .orElseThrow(() -> new RuntimeException("Persona no encontrada"));
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Persona crear(@RequestBody Persona persona) {
-        return personaService.guardar(persona);
+    public ResponseEntity<Persona> crear(@Valid @RequestBody Persona persona) {
+        Persona nueva = personaService.guardar(persona);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
 
     @PutMapping("/{id}")
-    public Persona actualizar(@PathVariable Integer id, @RequestBody Persona persona) {
-        return personaService.actualizar(id, persona);
+    public ResponseEntity<Persona> actualizar(@PathVariable Integer id,
+                                              @Valid @RequestBody Persona persona) {
+        Persona actualizada = personaService.actualizar(id, persona);
+        return ResponseEntity.ok(actualizada);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         personaService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
